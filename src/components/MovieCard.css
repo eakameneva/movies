@@ -12,22 +12,70 @@
 
 .card-title {
   margin: 0;
+  margin-bottom: 0;
+  max-width: 92%;
+}
+.card_body {
+  padding: 10px 20px 5px 20px;
+  gap: 7px;
 }
 .pic-container {
   min-width: 185px;
   min-height: 281px;
   display: flex;
-  /* padding: 0 */
+  position: relative;
+}
+img:before {
+  content: ' ';
+  display: block;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(230, 230, 230);
+}
+
+img:after {
+  content: 'No poster';
+  display: block;
+  font-size: 16px;
+  color: rgb(100, 100, 100);
+  position: absolute;
+  width: 100%;
+  text-align: center;
 }
 
 .rating-circle {
-  width: 30px;
-  height: 30px;
-  border: red 2px solid;
+  border: 2px solid;
   border-radius: 50%;
   position: absolute;
   right: 7px;
   top: 7px;
   font-size: 12px;
-  padding: 4px;
+  padding: 6px 6px;
+}
+
+.red {
+  border-color: #e90000;
+}
+.orange {
+  border-color: #e97e00;
+}
+.yellow {
+  border-color: #e9d100;
+}
+.green {
+  border-color: #66e900;
+}
+
+.genres-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-container {
+  align-items: stretch;
+}
+
+.description-container {
+  justify-content: space-between;
 }

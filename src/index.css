@@ -31,3 +31,9 @@ code {
 .pagination {
   margin: auto;
 }
+
+.rating_container {
+  font-size: 16px;
+  margin-left: 20px;
+  padding-bottom: 10px;
+}

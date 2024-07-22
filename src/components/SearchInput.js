@@ -33,9 +33,12 @@ export default class SearchInput extends Component {
       <Input
         onChange={this.onLabelChange}
         value={searchText}
+        name='input-form'
+        autoFocus
         className='search-input'
         placeholder='Type to search...'
         size='middle'
+        autoсomplete='off'
       ></Input>
     )
   }
