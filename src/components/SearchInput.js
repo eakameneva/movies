@@ -12,6 +12,7 @@ export default class SearchInput extends Component {
     this.onLabelChange = this.onLabelChange.bind(this)
     this.debouncedSubmit = debounce(this.onSubmit.bind(this), 2000)
   }
+
   onLabelChange(event) {
     this.setState({
       searchText: event.target.value,
@@ -27,6 +28,7 @@ export default class SearchInput extends Component {
     const { onMovieSearch } = this.props
     onMovieSearch(trimmedLabel, 1)
   }
+
   render() {
     const { searchText } = this.state
     return (
@@ -39,7 +41,7 @@ export default class SearchInput extends Component {
         placeholder='Type to search...'
         size='middle'
         autoсomplete='off'
-      ></Input>
+       />
     )
   }
 }

@@ -21,7 +21,7 @@ export default class Rating extends Component {
         accept: 'application/json',
         'Content-Type': 'application/json;charset=utf-8',
       },
-      body: JSON.stringify({ value: value }),
+      body: JSON.stringify({ value }),
     }
 
     fetch(
@@ -29,18 +29,19 @@ export default class Rating extends Component {
       options
     )
       .then((response) => response.json())
-      .then((response) => console.log(response))
+      .then((response) => response)
       .catch((error) => {
-        console.error('Could not add rating', error)
+        throw new Error('Could not add rating', error)
       })
   }
 
   getCurrentRating = () => {
     const { movieId } = this.props
     const { rating, hasRated } = this.state
-    if (localStorage.hasOwnProperty(movieId)) {
+    if (Object.prototype.hasOwnProperty.call(localStorage, movieId)) {
       return +localStorage.getItem(movieId)
-    } else if (hasRated) {
+    }
+    if (hasRated) {
       return rating
     }
     return 0
@@ -55,7 +56,7 @@ export default class Rating extends Component {
           count={10}
           value={this.getCurrentRating()}
           onChange={this.addRating}
-        ></Rate>
+        />
       </div>
     )
   }

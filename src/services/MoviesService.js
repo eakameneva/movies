@@ -1,5 +1,5 @@
 export default class MoviesService {
-  async getMovies(name, page) {
+  static async getMovies(name, page) {
     const options = {
       method: 'GET',
       headers: {
