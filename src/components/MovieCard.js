@@ -13,8 +13,9 @@ export default function MovieCard({ movie, sessionId }) {
     if (text.length <= maxLength) {
       return text
     }
+
     const truncated = text.substr(0, maxLength)
-    return `${truncated.substr(0, truncated.lastIndexOf(' '))  }...`
+    return `${truncated.substr(0, truncated.lastIndexOf(' '))}...`
   }
   function formatDate(dateString) {
     if (!dateString) {
@@ -61,15 +62,18 @@ export default function MovieCard({ movie, sessionId }) {
             <GenresConsumer>
               {(value) => (
                 <div className='genres-container'>
-                  {movie.genre_ids.map((genreId) => value.map((genre) => {
+                  {movie.genre_ids.map((genreId) =>
+                    value.map((genre) => {
                       if (genre.id === genreId) {
                         return (
                           <Typography.Text key={genreId} code>
                             {genre.name}
                           </Typography.Text>
                         )
-                      } return null
-                    }))}
+                      }
+                      return null
+                    })
+                  )}
                 </div>
               )}
             </GenresConsumer>

@@ -41,7 +41,7 @@ export default class SearchInput extends Component {
         placeholder='Type to search...'
         size='middle'
         autoсomplete='off'
-       />
+      />
     )
   }
 }
