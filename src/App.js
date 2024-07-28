@@ -1,48 +1,25 @@
 import React, { Component } from 'react'
-import { Layout, Flex, Spin, Alert, Pagination, Tabs } from 'antd'
+import { Layout, Spin, Alert, Tabs } from 'antd'
 import { Offline, Online } from 'react-detect-offline'
 
 import MoviesService from './services/MoviesService'
-import MovieCard from './components/MovieCard'
 import SearchInput from './components/SearchInput'
 import { GenresProvider } from './components/GenresContext'
 import './index.css'
+import TabContent from './components/TabContent'
 
+const initialTabState = {
+  movies: [],
+  page: 1,
+  totalResults: 0,
+}
 export default class App extends Component {
-  static async createGuestSession() {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MWYzOWU5NTk0NTNhOTNiOTU3ZGRiMTVmOGVjYWZmYSIsInN1YiI6IjY2Njg4MDVmMDZjZmZjYTcwZjhhZmI4OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9mpcH370yM4yI3Cu3bcDDvPW1i2kObwvwVFy-Nl40dw',
-      },
-    }
-    const guestSessionRes = await fetch('https://api.themoviedb.org/3/authentication/guest_session/new', options)
-    if (!guestSessionRes.ok) {
-      throw new Error('Could not create guest session')
-    }
-    const guestSessionResult = await guestSessionRes.json()
-
-    const guestSessionId = guestSessionResult.guest_session_id
-    localStorage.setItem('sessionId', guestSessionId)
-    return guestSessionId
-  }
-
   constructor(props) {
     super(props)
 
     this.state = {
-      search: {
-        movies: [],
-        page: 1,
-        totalResults: 0,
-      },
-      rated: {
-        movies: [],
-        page: 1,
-        totalResults: 0,
-      },
+      search: initialTabState,
+      rated: initialTabState,
       loading: false,
       error: false,
       searchName: '',
@@ -59,7 +36,8 @@ export default class App extends Component {
         sessionId: id,
       })
     } else {
-      App.createGuestSession().then((id) => {
+      MoviesService.createGuestSession().then((id) => {
+        localStorage.setItem('sessionId', id)
         this.setState({
           sessionId: id,
         })
@@ -88,19 +66,20 @@ export default class App extends Component {
   }
 
   onRatedPageChange = (page) => {
+    const { sessionId } = this.state
     this.setState((prevState) => ({
       rated: { ...prevState.rated, page },
       loading: true,
     }))
-    this.getRatedMovies(page).then(this.onRatedMoviesLoaded).catch(this.onError)
+    MoviesService.getRatedMovies(page, sessionId).then(this.onRatedMoviesLoaded).catch(this.onError)
   }
 
   onTabChange = (tab) => {
-    const { rated } = this.state
+    const { rated, sessionId } = this.state
     const { page } = rated
     this.setState({ activeTab: tab })
     if (tab === 'ratedTab') {
-      this.getRatedMovies(page).then((movies) => this.onRatedMoviesLoaded(movies))
+      MoviesService.getRatedMovies(page, sessionId).then((movies) => this.onRatedMoviesLoaded(movies))
     }
   }
 
@@ -109,57 +88,6 @@ export default class App extends Component {
       error: true,
       loading: false,
     })
-  }
-
-  getRatedMovies = (page) => {
-    const { sessionId } = this.state
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-      },
-    }
-    return fetch(
-      `https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies?api_key=61f39e959453a93b957ddb15f8ecaffa&page=${page}`,
-      options
-    )
-      .then((res) => {
-        if (res.status === 404) {
-          return Promise.reject(new Error('No rated movies'))
-        }
-        return res.json()
-      })
-      .then((res) => {
-        if (res.results) {
-          return res
-        }
-        return []
-      })
-      .catch((err) => {
-        if (err === 'No rated movies') {
-          return []
-        }
-        throw new Error(err)
-      })
-  }
-
-  static async getGenres() {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI2MWYzOWU5NTk0NTNhOTNiOTU3ZGRiMTVmOGVjYWZmYSIsInN1YiI6IjY2Njg4MDVmMDZjZmZjYTcwZjhhZmI4OCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.9mpcH370yM4yI3Cu3bcDDvPW1i2kObwvwVFy-Nl40dw',
-      },
-    }
-
-    const genresRes = await fetch('https://api.themoviedb.org/3/genre/movie/list?language=en', options)
-    if (!genresRes.ok) {
-      throw new Error('Could not get genres')
-    }
-    const genresResult = await genresRes.json()
-    const genresArray = genresResult.genres
-    return genresArray
   }
 
   updateMovies = (name, page) => {
@@ -172,71 +100,31 @@ export default class App extends Component {
   }
 
   loadGenres() {
-    App.getGenres().then((res) => {
-      this.setState({ genres: res })
-    })
+    MoviesService.getGenres()
+      .then((res) => {
+        this.setState({ genres: res })
+      })
+      .catch(this.onError)
   }
 
   render() {
     const { search, rated, loading, error, activeTab, genres, sessionId } = this.state
-    const { movies } = search
+
     const items = [
       {
         key: 'searchTab',
         label: 'Search',
         children: (
-          <div>
-            <SearchInput onMovieSearch={this.updateMovies} />
-            <Flex wrap gap='large' justify='space-evenly' className='cards-list'>
-              {movies.length < 1 && <span>No movies found</span>}
-
-              {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} sessionId={sessionId} />
-              ))}
-            </Flex>
-            {movies.length > 0 && (
-              <div className='pagination-wrapper'>
-                {' '}
-                <Pagination
-                  className='pagination'
-                  onChange={this.onPageChange}
-                  current={search.page}
-                  pageSize={20}
-                  total={search.totalResults}
-                  showSizeChanger={false}
-                />
-              </div>
-            )}
-          </div>
+          <TabContent moviesData={search} onPageChange={this.onPageChange} sessionId={sessionId}>
+            {' '}
+            <SearchInput onMovieSearch={this.updateMovies} />{' '}
+          </TabContent>
         ),
       },
       {
         key: 'ratedTab',
         label: 'Rated',
-        children: (
-          <div>
-            <Flex wrap gap='large' justify='space-evenly' className='cards-list'>
-              {rated.movies.length < 1 && <span>No movies rated</span>}
-
-              {rated.movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} sessionId={sessionId} />
-              ))}
-            </Flex>
-            {rated.movies.length > 0 && (
-              <div className='pagination-wrapper'>
-                {' '}
-                <Pagination
-                  className='pagination'
-                  onChange={this.onRatedPageChange}
-                  current={rated.page}
-                  pageSize={20}
-                  total={rated.totalResults}
-                  showSizeChanger={false}
-                />
-              </div>
-            )}
-          </div>
-        ),
+        children: <TabContent moviesData={rated} onPageChange={this.onRatedPageChange} sessionId={sessionId} />,
       },
     ]
 
