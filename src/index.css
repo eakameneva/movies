@@ -33,7 +33,22 @@ code {
 }
 
 .rating_container {
-  font-size: 16px;
-  margin-left: 20px;
+  font-size: 15px;
   padding-bottom: 10px;
+}
+
+@media (max-width: 420px) {
+  .wrapper {
+    width: 420px;
+    padding: 16px;
+    padding-top: 0;
+  }
+
+  .pagination-wrapper {
+    margin-top: 20px;
+  }
+  .rating_container {
+    font-size: 17px;
+    margin-left: 120px;
+  }
 }

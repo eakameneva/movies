@@ -46,40 +46,48 @@ export default function MovieCard({ movie, sessionId }) {
         },
       }}
     >
-      <Flex align='flex-start' className='card-container'>
-        <div className='pic-container'>
-          <img alt='poster' src={`${posterurl}${movie.poster_path}`} className='poster' />
-        </div>
-        <Flex vertical className='description-container'>
+      <Flex align='flex-start' className='card-container' vertical>
+        <Flex>
+          <div className='pic-container'>
+            <img alt='poster' src={`${posterurl}${movie.poster_path}`} className='poster' />
+          </div>
           <Flex className='card_body' vertical align='flex-start'>
-            <Typography.Title className='card-title' level={5} style={{ marginBottom: 0 }}>
-              {movie.title}
-            </Typography.Title>
-            <div className={`rating-circle ${chooseBorderColor(movie.vote_average)}`}>
-              {movie.vote_average.toFixed(1)}
+            <div>
+              <Typography.Title className='card-title' level={5} style={{ marginBottom: 0 }}>
+                {movie.title}
+              </Typography.Title>
+              <div className={`rating-circle ${chooseBorderColor(movie.vote_average)}`}>
+                {movie.vote_average.toFixed(1)}
+              </div>
+              <Typography.Text className='release-date'>{formatDate(movie.release_date)} </Typography.Text>
+              <GenresConsumer>
+                {(value) => (
+                  <div className='genres-container'>
+                    {movie.genre_ids.map((genreId) =>
+                      value.map((genre) => {
+                        if (genre.id === genreId) {
+                          return (
+                            <Typography.Text key={genreId} code className='genre-name'>
+                              {genre.name}
+                            </Typography.Text>
+                          )
+                        }
+                        return null
+                      })
+                    )}
+                  </div>
+                )}
+              </GenresConsumer>
             </div>
-            <Typography.Text>{formatDate(movie.release_date)} </Typography.Text>
-            <GenresConsumer>
-              {(value) => (
-                <div className='genres-container'>
-                  {movie.genre_ids.map((genreId) =>
-                    value.map((genre) => {
-                      if (genre.id === genreId) {
-                        return (
-                          <Typography.Text key={genreId} code>
-                            {genre.name}
-                          </Typography.Text>
-                        )
-                      }
-                      return null
-                    })
-                  )}
-                </div>
-              )}
-            </GenresConsumer>
 
-            <Typography.Text>{truncateText(movie.overview, 110)}</Typography.Text>
+            <Flex vertical className='description-container'>
+              <Typography.Text>{truncateText(movie.overview, 120)}</Typography.Text>
+              <Rating sessionId={sessionId} movieId={movie.id} />
+            </Flex>
           </Flex>
+        </Flex>
+        <Flex vertical className='description-container mobile'>
+          <Typography.Text>{truncateText(movie.overview, 140)}</Typography.Text>
           <Rating sessionId={sessionId} movieId={movie.id} />
         </Flex>
       </Flex>

@@ -13,10 +13,10 @@
 .card-title {
   margin: 0;
   margin-bottom: 0;
-  max-width: 92%;
+  max-width: 90%;
 }
 .card_body {
-  padding: 10px 20px 5px 20px;
+  padding: 10px 20px 0 20px;
   gap: 7px;
 }
 .pic-container {
@@ -70,6 +70,11 @@ img:after {
 .genres-container {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-name code {
+  margin: 0;
 }
 
 .card-container {
@@ -78,4 +83,58 @@ img:after {
 
 .description-container {
   justify-content: space-between;
+  flex: 1;
+}
+
+.release-date {
+  color: #827e7e;
+  font-size: 12px;
+}
+.mobile {
+  display: none;
+}
+
+@media (max-width: 420px) {
+  .card-container {
+    padding: 6px 10px;
+    width: 388px;
+    height: 245px;
+  }
+  .card_body {
+    padding: 0 20px 19px 13px;
+    gap: 7px;
+  }
+  .poster {
+    max-width: 60px;
+    max-height: 91px;
+  }
+
+  .pic-container {
+    display: inline;
+    min-width: 60px;
+    min-height: 91px;
+  }
+  img:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    width: 60px;
+    height: 91px;
+    background-color: rgb(230, 230, 230);
+  }
+
+  img:after {
+    content: 'No poster';
+    display: block;
+    font-size: 16px;
+    color: rgb(100, 100, 100);
+    position: absolute;
+    text-align: center;
+  }
+  .description-container {
+    display: none;
+  }
+  .mobile {
+    display: flex;
+  }
 }

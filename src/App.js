@@ -31,7 +31,6 @@ export default class App extends Component {
 
   constructor(props) {
     super(props)
-    this.movieService = new MoviesService()
 
     this.state = {
       search: {
@@ -60,7 +59,7 @@ export default class App extends Component {
         sessionId: id,
       })
     } else {
-      this.createGuestSession().then((id) => {
+      App.createGuestSession().then((id) => {
         this.setState({
           sessionId: id,
         })
@@ -169,11 +168,11 @@ export default class App extends Component {
       loading: true,
       searchName: name,
     }))
-    this.movieService.getMovies(name, page).then(this.onMoviesLoaded).catch(this.onError)
+    MoviesService.getMovies(name, page).then(this.onMoviesLoaded).catch(this.onError)
   }
 
   loadGenres() {
-    this.getGenres().then((res) => {
+    App.getGenres().then((res) => {
       this.setState({ genres: res })
     })
   }
@@ -188,7 +187,7 @@ export default class App extends Component {
         children: (
           <div>
             <SearchInput onMovieSearch={this.updateMovies} />
-            <Flex wrap gap='large' justify='space-evenly'>
+            <Flex wrap gap='large' justify='space-evenly' className='cards-list'>
               {movies.length < 1 && <span>No movies found</span>}
 
               {movies.map((movie) => (
@@ -216,7 +215,7 @@ export default class App extends Component {
         label: 'Rated',
         children: (
           <div>
-            <Flex wrap gap='large' justify='space-evenly'>
+            <Flex wrap gap='large' justify='space-evenly' className='cards-list'>
               {rated.movies.length < 1 && <span>No movies rated</span>}
 
               {rated.movies.map((movie) => (
